@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const studentSchema = new mongoose.Schema(
   {
+    type: {
+      type: String,
+      enum: ["S"],
+      default: "S",
+      required: true,
+    },
     name: {
       type: String,
       required: true,

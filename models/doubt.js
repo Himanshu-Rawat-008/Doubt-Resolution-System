@@ -10,6 +10,10 @@ const doubtSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Students",
+    },
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -19,6 +23,11 @@ const doubtSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["ESCALATED", "NEW", "BUSY", "SOLVED"],
+      default: "NEW",
+      required: true,
+    },
+    solution: {
+      type: String,
     },
   },
   {

@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const teacherSchema = new mongoose.Schema(
   {
+    type: {
+      type: String,
+      enum: ["T"],
+      default: "T",
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -21,5 +27,5 @@ const teacherSchema = new mongoose.Schema(
   }
 );
 
-const Teacher = mongoose.model("Teacher", teacherschema);
+const Teacher = mongoose.model("Teacher", teacherSchema);
 module.exports = Teacher;

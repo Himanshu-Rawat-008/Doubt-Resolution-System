@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const assistantSchema = new mongoose.Schema(
   {
+    type: {
+      type: String,
+      enum: ["TA"],
+      default: "TA",
+      required: true,
+    },
     name: {
       type: String,
       required: true,
