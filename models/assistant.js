@@ -27,11 +27,16 @@ const assistantSchema = new mongoose.Schema(
         ref: "Doubts",
       },
     ],
+    status: {
+      type: String,
+      enum: ["BUSY", "AVAILABLE"],
+      default: "BUSY",
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const Assistant = mongoose.model("Assistants", studentSchema);
+const Assistant = mongoose.model("Assistants", assistantSchema);
 module.exports = Assistant;
