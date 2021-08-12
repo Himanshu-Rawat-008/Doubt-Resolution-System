@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const teacherController = require("../controllers/teacherController");
-const checkUser = require("../middleware/checkUser");
 const passport = require("passport");
 
-router.post("/sign-up", passport.blockAccess, teacherController.signUp);
+router.post("/sign-up", teacherController.signUp);
 
 router.get(
   "/sign-in",
@@ -19,13 +18,13 @@ router.get(
 );
 +router.get(
   "/show-assistants",
-  checkUser.teacherUser,
+  passport.checkAuthentication,
   teacherController.showAssistants
 );
 
 router.get(
   "/assistant-detail/:id",
-  checkUser.teacherUser,
+  passport.checkAuthentication,
   teacherController.assistantDetail
 );
 

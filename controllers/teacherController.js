@@ -7,10 +7,14 @@ env.config();
 
 module.exports.signUp = async function (req, res) {
   try {
+    if (req.isAuthenticated())
+      return res.status(400).json({ error: "What are you trying" });
+
     if (req.body.password != req.body.confirm_password) {
       // if password is not same
       return res.status(400).json({ error: "Password dont match" });
     }
+
     const teacher = Teacher.findOne({ email: req.body.email });
 
     if (teacher) return res.status(400).json({ error: "Account Exists" });
@@ -28,6 +32,9 @@ module.exports.signUp = async function (req, res) {
 
 module.exports.signIn = async function (req, res) {
   try {
+    if (req.isAuthenticated())
+      return res.status(400).json({ error: "What are you trying" });
+
     if (!req.user) return res.status(404).json({ error: "Not Found" });
 
     if (req.isAuthenticated()) {

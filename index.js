@@ -34,7 +34,7 @@ app.use(
     store: MongoStore.create(
       {
         mongoUrl: process.env.DB_URL,
-        autoRemove: "disabled",
+        autoRemove: "enabled",
       },
       function (err) {
         console.log(err || "connect db setup");

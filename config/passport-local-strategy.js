@@ -69,9 +69,4 @@ passport.checkAuthentication = function (req, res, next) {
   return res.status(404).json({ error: "Not Signed In" });
 };
 
-passport.blockAccess = function (req, res, next) {
-  if (req.isAuthenticated())
-    return res.status(403).json({ error: "Access Denied" });
-  next();
-};
 module.exports = passport;
