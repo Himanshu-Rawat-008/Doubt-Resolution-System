@@ -7,6 +7,6 @@ router.use("/teacher", require("./teacher"));
 
 router.use("/student", require("./student"));
 
-router.use("/ta", require("./comments"));
+router.use("/ta", require("./assistant"));
 
 module.exports = router;

@@ -1,35 +1,24 @@
 const Student = require("../models/student");
-const Comments = require("../models/comments");
+const Comment = require("../models/comments");
 const Doubt = require("../models/doubt");
 
 const env = require("dotenv");
 env.config();
 
-function encryptPassword(password) {
-  const salt = bcrypt.genSaltSync(10);
-  return bcrypt.hashSync(password, salt);
-}
-
-module.exports.signUp = async function (res, res) {
+module.exports.signUp = async function (req, res) {
   try {
     if (req.body.password != req.body.confirm_password) {
       // if password is not same
       return res.status(400).json({ error: "Password dont match" });
     }
-    let student = Student.findOne({ email: req.body.email });
-
+    let student = await Student.findOne({ email: req.body.email });
     if (student) return res.status(400).json({ error: "Account Exists" });
 
-    // save password in encrypted form
-    req.body.password = encryptPassword(req.body.password);
-    delete req.body.confirm_password;
-
     req.body.type = "S";
-
-    const student = await Student.create(req.body);
+    const { name, password, email, type } = req.body;
+    student = await Student.create({ name, email, password, type });
 
     student.password = undefined;
-
     return res.status(200).json({ student });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
@@ -37,14 +26,25 @@ module.exports.signUp = async function (res, res) {
 };
 
 module.exports.signIn = async function (req, res) {
-  if (!req.user) return res.status(404).json({ error: "Data Dont Exists" });
+  try {
+    if (!req.user) return res.status(404).json({ error: "Not Found" });
 
-  return res.status(200).json({ student: req.student });
+    if (req.isAuthenticated()) {
+      let type = req.user.type;
+      req.user.password = undefined;
+      if (type == "S") {
+        return res.status(200).json({ Success: "Success", Student: req.user });
+      }
+    }
+    return res.status(400).json({ Error: "Error " });
+  } catch (err) {
+    return res.status(400).json({ error: "error" });
+  }
 };
 
 module.exports.createDoubt = async function (req, res) {
   try {
-    const id = req.param.id;
+    const id = req.params.id;
     const { title, description } = req.body;
     let doubt = await Doubt.create({
       title,
@@ -53,7 +53,7 @@ module.exports.createDoubt = async function (req, res) {
       by: id,
     });
 
-    return res.status(200).json({ doubt });
+    return res.status(200).json({ Doubt: doubt });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }

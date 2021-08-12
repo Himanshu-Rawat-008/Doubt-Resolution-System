@@ -5,39 +5,30 @@ const Student = require("../models/student");
 const Teacher = require("../models/teacher");
 const Assistant = require("../models/assistant");
 
-const brcypt = require("brcypt");
-
 // authentication using passport
 passport.use(
   new LocalStrategy(
     {
-      // email defined in models
       usernameField: "email",
     },
     async function (email, password, done) {
-      // find the user and establish the identity
       try {
         let student = await Student.findOne({ email: email });
-        if (student) {
-          if (bcrypt.compareSync(password, student.password)) {
-            return done(null, student);
-          }
-        }
-        let teacher = await Teacher.findOne({ email: email });
-        if (teacher) {
-          if (bcrypt.compareSync(password, teacher.password)) {
-            return done(null, teacher);
-          }
-        }
         let assistant = await Assistant.findOne({ email: email });
-        if (assistant) {
-          if (bcrypt.compareSync(password, assistant.password)) {
-            return done(null, assistant);
-          }
+        let teacher = await Teacher.findOne({ email: email });
+        if (student != null) {
+          if (student.password == password) return done(null, student);
         }
+        if (assistant != null) {
+          if (assistant.password == password) return done(null, assistant);
+        }
+        if (teacher != null) {
+          if (teacher.password == password) return done(null, teacher);
+        }
+
         return done(null, false);
-      } catch (e) {
-        return done(e);
+      } catch (err) {
+        return res.status(400).json({ err: "error" });
       }
     }
   )
@@ -46,21 +37,29 @@ passport.use(
 // Serialize user function
 // Serializing the user to decide which key is to be kept in the cookies
 passport.serializeUser(function (user, done) {
-  done(null, user.id);
+  done(null, user._id);
 });
 // Deserialize user function
 // Deserializing the user from the key in the cookies
 passport.deserializeUser(async function (id, done) {
-  let student = await Student.findById({ id });
-  if (student) return done(null, student);
+  try {
+    let student = await Student.findById({ id }).select("-password");
+    if (student != null) {
+      return done(null, student);
+    }
 
-  let teacher = await Teacher.findById({ id });
-  if (teacher) return done(null, teacher);
+    let teacher = await Teacher.findById({ id }).select("-password");
+    if (teacher != null) {
+      return done(null, teacher);
+    }
 
-  let assistant = await Assistant.findById({ id });
-  if (assistant) return done(null, assistant);
-
-  return done(null);
+    let assistant = await Assistant.findById({ id }).select("-password");
+    if (assistant != null) {
+      return done(null, assistant);
+    }
+  } catch (err) {
+    return done(null, err);
+  }
 });
 
 // check if user is authenticated

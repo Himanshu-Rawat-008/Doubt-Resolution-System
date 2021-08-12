@@ -9,8 +9,8 @@
   "author": "Himanshu Rawat",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
-    "brcypt": "^1.0.1",
     "connect-mongo": "^4.4.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",

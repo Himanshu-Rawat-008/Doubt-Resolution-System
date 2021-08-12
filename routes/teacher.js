@@ -4,17 +4,20 @@ const teacherController = require("../controllers/teacherController");
 const checkUser = require("../middleware/checkUser");
 const passport = require("passport");
 
-router.post("/signUp", passport.blockAccess, teacherController.signUp);
+router.post("/sign-up", passport.blockAccess, teacherController.signUp);
 
 router.get(
-  "/signIn",
+  "/sign-in",
   passport.authenticate("local", { failWithError: true }),
   teacherController.signIn
 );
 
-router.get("/signOut", passport.checkAuthentication, teacherController.signOut);
-
 router.get(
+  "/sign-out",
+  passport.checkAuthentication,
+  teacherController.signOut
+);
++router.get(
   "/show-assistants",
   checkUser.teacherUser,
   teacherController.showAssistants

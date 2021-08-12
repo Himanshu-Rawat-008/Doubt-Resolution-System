@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const assistantController = require("../controllers/assistantController");
 const checkUser = require("../middleware/checkUser");
+const passport = require("passport");
 router.post("/signUp", assistantController.signUp);
 
 router.get(
@@ -14,19 +15,19 @@ router.get("/signOut", assistantController.signOut);
 
 router.get("/doubts", checkUser.assistantUser, assistantController.showDoubts);
 
-router.update(
+router.put(
   "/escalate-doubt/:id",
   checkUser.assistantUser,
   assistantController.escalateDoubt
 );
 
-router.update(
+router.put(
   "/solved-doubt",
   checkUser.assistantUser,
   assistantController.solvedDoubt
 );
 
-router.update(
+router.put(
   "/doubt-taken",
   checkUser.assistantUser,
   assistantController.takenDoubt
