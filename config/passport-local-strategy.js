@@ -14,7 +14,7 @@ passport.use(
       // email defined in models
       usernameField: "email",
     },
-    async function (req, email, password, done) {
+    async function (email, password, done) {
       // find the user and establish the identity
       try {
         let student = await Student.findOne({ email: email });
@@ -59,14 +59,20 @@ passport.deserializeUser(async function (id, done) {
 
   let assistant = await Assistant.findById({ id });
   if (assistant) return done(null, assistant);
+
+  return done(null);
 });
 
 // check if user is authenticated
 passport.checkAuthentication = function (req, res, next) {
   // if the user is signed in then pass on the req to the next fucntion
-  if (req.isAuthenticated()) {
-    return next();
-  } else return res.status(404).json({ error: "Not Signed In" });
+  if (req.isAuthenticated()) return next();
+  return res.status(404).json({ error: "Not Signed In" });
 };
 
+passport.blockAccess = function (req, res, next) {
+  if (req.isAuthenticated())
+    return res.status(403).json({ error: "Access Denied" });
+  next();
+};
 module.exports = passport;

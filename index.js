@@ -24,6 +24,7 @@ app.use(express.json());
 // take session cookie and exncrypt it
 app.use(
   session({
+    name: "Hosting",
     secret: process.env.SESSION_COOKIE_KEY,
     saveUninitialized: false,
     resave: false,

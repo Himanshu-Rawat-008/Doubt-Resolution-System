@@ -87,3 +87,8 @@ module.exports.showSolvedDoubts = async function (req, res) {
     return res.status(400).json({ error: "Server Error" });
   }
 };
+
+module.exports.signOut = async function (req, res) {
+  req.logout();
+  return res.status(200).json({ teacher: undefined });
+};

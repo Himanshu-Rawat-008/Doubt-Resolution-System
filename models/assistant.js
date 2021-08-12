@@ -21,22 +21,17 @@ const assistantSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    escalated: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Doubts",
-      },
-    ],
-    solved: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Doubts",
-      },
-    ],
-    status: {
-      type: String,
-      enum: ["BUSY", "AVAILABLE"],
-      default: "BUSY",
+    escalated: {
+      type: Number,
+      default: 0,
+    },
+    solved: {
+      type: Number,
+      default: 0,
+    },
+    doubt: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Doubts",
     },
   },
   {
