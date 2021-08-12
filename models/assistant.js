@@ -27,7 +27,7 @@ const assistantSchema = new mongoose.Schema(
         ref: "Doubts",
       },
     ],
-    resolved: [
+    solved: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Doubts",

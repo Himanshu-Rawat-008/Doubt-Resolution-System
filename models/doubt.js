@@ -29,6 +29,10 @@ const doubtSchema = new mongoose.Schema(
     solution: {
       type: String,
     },
+    solvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Assistant",
+    },
   },
   {
     timestamps: true,

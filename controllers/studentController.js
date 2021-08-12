@@ -74,13 +74,14 @@ module.exports.addComment = async function (req, res) {
   }
 };
 
-module.exports.showDoubts = async function (req, res) {
+module.exports.showSolvedDoubts = async function (req, res) {
   try {
-    let doubt = await Doubt.find({})
+    let doubt = await Doubt.aggregate()
+      .match({ status: "SOLVED" })
+      .sort("-createdAt")
       .populate("by")
-      .populate({ path: "comments", select: "by" })
+      .populate({ path: "comments", populate: { path: "doubt by" } })
       .exec();
-
     return res.status(200).json({ doubt });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
