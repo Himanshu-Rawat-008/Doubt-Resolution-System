@@ -24,7 +24,7 @@ module.exports.signUp = async function (req, res) {
 
     teacher.password = undefined;
 
-    return res.status(200).json({ teacher });
+    return res.status(200).json({ Teacher: teacher });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }

@@ -22,7 +22,7 @@ module.exports.signUp = async function (req, res) {
     student = await Student.create({ name, email, password, type });
 
     student.password = undefined;
-    return res.status(200).json({ student });
+    return res.status(200).json({ Student: student });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }
@@ -80,7 +80,6 @@ module.exports.addComment = async function (req, res) {
 
     return res.status(200).json({ comment, doubt });
   } catch (err) {
-    console.log(err);
     return res.status(400).json({ error: "Server Error" });
   }
 };
@@ -92,7 +91,7 @@ module.exports.showSolvedDoubts = async function (req, res) {
       .sort("-createdAt")
       .populate("by")
       .populate({ path: "comments", populate: { path: "doubt by" } })
-      .exec();
+      .execPopulate();
     return res.status(200).json({ doubt });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
@@ -102,7 +101,7 @@ module.exports.showSolvedDoubts = async function (req, res) {
 module.exports.signOut = async function (req, res) {
   try {
     req.logout();
-    return res.status(200).json({ teacher: req.user });
+    return res.status(200).json({ student: req.user });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }

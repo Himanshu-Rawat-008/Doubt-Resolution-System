@@ -7,16 +7,13 @@ router.post("/sign-up", teacherController.signUp);
 
 router.get(
   "/sign-in",
-  passport.authenticate("local", { failWithError: true }),
+  passport.authenticate("local"),
   teacherController.signIn
 );
 
+router.get("/sign-out", teacherController.signOut);
+
 router.get(
-  "/sign-out",
-  passport.checkAuthentication,
-  teacherController.signOut
-);
-+router.get(
   "/show-assistants",
   passport.checkAuthentication,
   teacherController.showAssistants
