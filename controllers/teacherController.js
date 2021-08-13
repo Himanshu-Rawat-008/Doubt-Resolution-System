@@ -32,9 +32,6 @@ module.exports.signUp = async function (req, res) {
 
 module.exports.signIn = async function (req, res) {
   try {
-    if (req.isAuthenticated())
-      return res.status(400).json({ error: "What are you trying" });
-
     if (!req.user) return res.status(404).json({ error: "Not Found" });
 
     if (req.isAuthenticated()) {

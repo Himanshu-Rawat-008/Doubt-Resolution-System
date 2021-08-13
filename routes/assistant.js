@@ -2,15 +2,18 @@ const express = require("express");
 const router = express.Router();
 const assistantController = require("../controllers/assistantController");
 const passport = require("passport");
-router.post("/signUp", assistantController.signUp);
+const middleware = require("../middleware");
+
+router.post("/sign-up", assistantController.signUp);
 
 router.get(
-  "/signIn",
+  "/sign-in",
+  middleware.checkUser,
   passport.authenticate("local", { failWithError: true }),
   assistantController.signIn
 );
 
-router.get("/signOut", assistantController.signOut);
+router.get("/sign-out", assistantController.signOut);
 
 router.get(
   "/doubts",
@@ -25,7 +28,7 @@ router.put(
 );
 
 router.put(
-  "/solved-doubt",
+  "/solution-of-doubt",
   passport.checkAuthentication,
   assistantController.solvedDoubt
 );

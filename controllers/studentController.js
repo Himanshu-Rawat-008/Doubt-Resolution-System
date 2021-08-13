@@ -30,9 +30,6 @@ module.exports.signUp = async function (req, res) {
 
 module.exports.signIn = async function (req, res) {
   try {
-    if (req.isAuthenticated())
-      return res.status(400).json({ error: "What are you trying" });
-
     if (!req.user) return res.status(404).json({ error: "Not Found" });
 
     if (req.isAuthenticated()) {
@@ -77,6 +74,7 @@ module.exports.addComment = async function (req, res) {
     let doubt = await Doubt.findById({ _id: doubtId });
 
     doubt.comments.push(comment);
+    comment.save();
 
     return res.status(200).json({ comment, doubt });
   } catch (err) {

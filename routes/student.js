@@ -2,11 +2,13 @@ const express = require("express");
 const router = express.Router();
 const studentController = require("../controllers/studentController");
 const passport = require("passport");
+const middleware = require("../middleware");
 
-router.post("/sign-up", studentController.signUp);
+router.post("/sign-up", middleware.checkUser, studentController.signUp);
 
 router.get(
   "/sign-in",
+  middleware.checkUser,
   passport.authenticate("local"),
   studentController.signIn
 );

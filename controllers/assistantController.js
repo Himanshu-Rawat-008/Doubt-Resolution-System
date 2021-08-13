@@ -13,8 +13,9 @@ module.exports.signUp = async function (req, res) {
       // if password is not same
       return res.status(400).json({ error: "Password dont match" });
     }
-    let assistant = Assistant.findOne({ email: req.body.email });
+    let assistant = await Assistant.findOne({ email: req.body.email });
 
+    console.log(assistant);
     if (assistant) return res.status(400).json({ error: "Account Exists" });
 
     req.body.type = "TA";
@@ -22,7 +23,7 @@ module.exports.signUp = async function (req, res) {
 
     assistant.password = undefined;
 
-    return res.status(200).json({ assistant });
+    return res.status(200).json({ Assistant: assistant });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }
@@ -30,8 +31,7 @@ module.exports.signUp = async function (req, res) {
 
 module.exports.signIn = async function (req, res) {
   try {
-    if (req.isAuthenticated())
-      return res.status(400).json({ error: "What are you trying" });
+    // console.log(req.session.passport);
 
     if (!req.user) return res.status(404).json({ error: "Not Found" });
 
@@ -52,9 +52,12 @@ module.exports.signIn = async function (req, res) {
 
 module.exports.signOut = async function (req, res) {
   try {
-    const id = req.body.id;
+    let assistant = await Assistant.findByIdAndUpdate({
+      _id: req.session.passport.user,
+    });
 
-    let assistant = await Assistant.findByIdAndUpdate({ id });
+    if (!assistant)
+      return res.status(200).json({ Error: "What are you trying" });
 
     if (assistant.doubt != undefined) {
       await Doubt.findByIdAndUpdate(
@@ -63,10 +66,11 @@ module.exports.signOut = async function (req, res) {
       );
       await Assistant.findByIdAndUpdate({ id }, { $set: { doubt: undefined } });
     }
+
     req.logout();
     return res
       .status(200)
-      .json({ assistant: undefined, message: "Logged Out Successfully" });
+      .json({ Assistant: undefined, message: "Logged Out Successfully" });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }
