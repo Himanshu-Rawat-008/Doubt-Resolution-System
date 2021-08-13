@@ -15,7 +15,6 @@ module.exports.signUp = async function (req, res) {
     }
     let assistant = await Assistant.findOne({ email: req.body.email });
 
-    console.log(assistant);
     if (assistant) return res.status(400).json({ error: "Account Exists" });
 
     req.body.type = "TA";

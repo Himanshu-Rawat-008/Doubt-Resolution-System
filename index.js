@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(
   session({
     name: "Hosting",
-    secret: process.env.SESSION_COOKIE_KEY,
+    secret: process.env.SESSION_COOKIE,
     saveUninitialized: false,
     resave: false,
     cookie: {

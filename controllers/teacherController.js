@@ -15,7 +15,7 @@ module.exports.signUp = async function (req, res) {
       return res.status(400).json({ error: "Password dont match" });
     }
 
-    const teacher = Teacher.findOne({ email: req.body.email });
+    let teacher = await Teacher.findOne({ email: req.body.email });
 
     if (teacher) return res.status(400).json({ error: "Account Exists" });
 
@@ -58,7 +58,7 @@ module.exports.showAssistants = async function (req, res) {
       .populate({ path: "comments", populate: { path: "doubt by" } })
       .exec();
 
-    return res.status(200).json({ assistant, doubt });
+    return res.status(200).json({ Assistants: assistant, Doubts: doubt });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }
@@ -68,15 +68,19 @@ module.exports.assistantDetail = async function (req, res) {
   try {
     const id = req.params.id;
 
-    let assistant = await Assistant.find({ id }).sort("-createdAt");
+    let assistant = await Assistant.find({ _id: id }).sort("-createdAt");
 
-    return res.status(200).json({ assistant });
+    return res.status(200).json({ AssistantDetail: assistant });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }
 };
 
 module.exports.signOut = async function (req, res) {
-  req.logout();
-  return res.status(200).json({ teacher: undefined });
+  try {
+    req.logout();
+    return res.status(200).json({ Teacher: undefined });
+  } catch (err) {
+    return res.status(400).json({ Error: "Server Error" });
+  }
 };
