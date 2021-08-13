@@ -76,7 +76,7 @@ module.exports.addComment = async function (req, res) {
     doubt.comments.push(comment);
     comment.save();
 
-    return res.status(200).json({ Comment: comment, Doubt: doubt });
+    return res.status(200).json({ Doubt: doubt });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }
@@ -90,7 +90,7 @@ module.exports.showSolvedDoubts = async function (req, res) {
       .populate("by")
       .populate({ path: "comments", populate: { path: "doubt by" } })
       .execPopulate();
-    return res.status(200).json({ doubt });
+    return res.status(200).json({ Doubt:doubt });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }
@@ -99,7 +99,7 @@ module.exports.showSolvedDoubts = async function (req, res) {
 module.exports.signOut = async function (req, res) {
   try {
     req.logout();
-    return res.status(200).json({ student: req.user });
+    return res.status(200).json({ Student: undefined });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }

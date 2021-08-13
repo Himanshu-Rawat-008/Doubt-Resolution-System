@@ -16,7 +16,7 @@ router.get(
 router.get("/sign-out", studentController.signOut);
 
 router.post(
-  "/create-doubt/:id",
+  "/create-doubt",
   passport.checkAuthentication,
   studentController.createDoubt
 );
