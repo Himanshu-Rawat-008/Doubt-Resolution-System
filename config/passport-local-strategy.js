@@ -65,6 +65,7 @@ passport.deserializeUser(async function (id, done) {
 // check if user is authenticated
 passport.checkAuthentication = function (req, res, next) {
   // if the user is signed in then pass on the req to the next fucntion
+  console.log(req.session);
   if (req.isAuthenticated()) return next();
   return res.status(404).json({ error: "Not Signed In" });
 };

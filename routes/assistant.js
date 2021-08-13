@@ -13,7 +13,11 @@ router.get(
   assistantController.signIn
 );
 
-router.get("/sign-out", assistantController.signOut);
+router.get(
+  "/sign-out",
+  passport.checkAuthentication,
+  assistantController.signOut
+);
 
 router.get(
   "/doubts",
@@ -28,13 +32,13 @@ router.put(
 );
 
 router.put(
-  "/solution-of-doubt",
+  "/solution-of-doubt/:id",
   passport.checkAuthentication,
   assistantController.solvedDoubt
 );
 
 router.put(
-  "/doubt-taken",
+  "/doubt-taken/:id",
   passport.checkAuthentication,
   assistantController.takenDoubt
 );

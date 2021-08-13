@@ -76,7 +76,7 @@ module.exports.addComment = async function (req, res) {
     doubt.comments.push(comment);
     comment.save();
 
-    return res.status(200).json({ comment, doubt });
+    return res.status(200).json({ Comment: comment, Doubt: doubt });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }

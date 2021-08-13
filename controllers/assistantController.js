@@ -52,7 +52,7 @@ module.exports.signIn = async function (req, res) {
 
 module.exports.signOut = async function (req, res) {
   try {
-    let assistant = await Assistant.findByIdAndUpdate({
+    let assistant = await Assistant.findById({
       _id: req.session.passport.user,
     });
 
@@ -60,11 +60,17 @@ module.exports.signOut = async function (req, res) {
       return res.status(200).json({ Error: "What are you trying" });
 
     if (assistant.doubt != undefined) {
-      await Doubt.findByIdAndUpdate(
-        { id: assistant.doubt.id },
-        { $set: { status: "ESCALATED" } }
+      let doubt = await Doubt.findByIdAndUpdate(
+        { _id: assistant.doubt },
+        { $set: { status: "ESCALATED" } },
+        { new: true }
       );
-      await Assistant.findByIdAndUpdate({ id }, { $set: { doubt: undefined } });
+
+      assistant = await Assistant.findByIdAndUpdate(
+        { _id: req.session.passport.user },
+        { $set: { doubt: undefined, escalated: assistant.escalated + 1 } },
+        { new: true }
+      );
     }
 
     req.logout();
@@ -77,33 +83,43 @@ module.exports.signOut = async function (req, res) {
 };
 module.exports.showDoubts = async function (req, res) {
   try {
-    let doubt = await Doubt.find({ status: { $in: ["NEW", "ESCALATED"] } });
-    return res.status(200).json({ doubt });
+    let doubt = await Doubt.find({ status: { $in: ["NEW", "ESCALATED"] } })
+      .sort("-createdAt")
+      .populate("by")
+      .populate({ path: "comments", populate: { path: "doubt by" } })
+      .exec();
+    return res.status(200).json({ Doubts: doubt });
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ error: "Server Error" });
   }
 };
 
 module.exports.escalateDoubt = async function (req, res) {
   try {
-    const doubtId = req.params.id;
-    const id = req.body.id;
+    const id = req.params.id;
 
-    let doubt = await Doubt.findById({ id: doubtId });
-    if (!doubt) return res.status(404).json({ error: "Doubt Not Found" });
+    let doubt = await Doubt.findById({ _id: id });
+    let assistant = await Assistant.findById({
+      _id: req.session.passport.user,
+    });
+
+    if (!doubt && !assistant && doubt._id != assistant._id)
+      return res.status(400).json({ Message: "What are you trying" });
 
     doubt = await Doubt.findByIdAndUpdate(
-      { id: doubtId },
-      { $set: { status: "ESCALATED" } }
+      { _id: id },
+      { $set: { status: "ESCALATED" } },
+      { new: true }
     );
 
-    let assistant = await Assistant.findById({ id });
     Assistant.findByIdAndUpdate(
-      { id },
-      { $set: { doubt: undefined, escalated: assistant.escalated + 1 } }
+      { _id: req.session.passport.user },
+      { $set: { doubt: undefined, escalated: assistant.escalated + 1 } },
+      { new: true }
     );
 
-    return res.status(200).json({ doubt, assistant });
+    return res.status(200).json({ Doubt: doubt, Assistant: assistant });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }
@@ -111,44 +127,69 @@ module.exports.escalateDoubt = async function (req, res) {
 
 module.exports.solvedDoubt = async function (req, res) {
   try {
-    const { doubtId, solution, assistantId } = req.body;
+    const { solution } = req.body;
+    const id = req.params.id;
 
-    let doubt = await Doubt.findById({ doubtId });
-    if (!doubt) return res.status(404).json({ error: "Problem not Found" });
+    let doubt = await Doubt.findById({ _id: id });
+    let assistant = await Assistant.findById({
+      _id: req.session.passport.user,
+    });
+
+    if (!doubt && !assistant && assistant._id != doubt._id)
+      return res.status(400).json({ Message: "What are you trying" });
 
     doubt = await Doubt.findByIdAndUpdate(
-      { doubtId },
-      { $set: { solution: solution, solvedBy: assistantId } }
+      { _id: doubt._id },
+      { $set: { solution: solution, solvedBy: assistant._id } },
+      { new: true }
     );
 
-    let assistant = await Assistant.findById({ assistantId });
-
-    await Assistant.findByIdAndUpdate(
-      { id: assistantId },
-      { $set: { doubt: undefined, solved: assistant.solved + 1 } }
+    assistant = await Assistant.findByIdAndUpdate(
+      { _id: assistant._id },
+      { $set: { doubt: undefined, solved: assistant.solved + 1 } },
+      { new: true }
     );
 
-    return res.status(200).json({ success: "Problem Solved", doubt });
+    return res
+      .status(200)
+      .json({ success: "Problem Solved", Doubt: doubt, Assistant: assistant });
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ error: "Server Error" });
   }
 };
 
 module.exports.takenDoubt = async function (req, res) {
   try {
-    const { doubtId, assistantId } = req.body;
+    const id = req.params.id;
 
-    let assistant = await Assistant.findByIdAndUpdate(
-      { id: assistantId },
-      { $set: { doubt: doubtId } }
+    // check if doubt is busy or not and assistant has not doubtId;
+    let assistant = await Assistant.findById({
+      _id: req.session.passport.user,
+    });
+
+    if (assistant.doubt != undefined || assistant.doubt != null)
+      return res.status(400).json({ Message: "What are you Trying" });
+
+    let doubt = await Doubt.findById({ _id: id });
+
+    if (doubt.status === "BUSY" || doubt.status === "SOLVED")
+      return res.status(400).json({ Message: "What are you trying" });
+
+    assistant = await Assistant.findByIdAndUpdate(
+      { _id: req.session.passport.user },
+      { $set: { doubt: id } },
+      { new: true }
     );
 
-    let doubt = await Doubt.findByIdAndUpdate(
-      { id: doubtId },
-      { $set: { status: "BUSY" } }
+    doubt = await Doubt.findByIdAndUpdate(
+      { _id: id },
+      { $set: { status: "BUSY" } },
+      { new: true }
     );
-    return res.status(200).json({ assistant, doubt });
+    return res.status(200).json({ Assistant: assistant, Doubt: doubt });
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ error: "Server Error" });
   }
 };
