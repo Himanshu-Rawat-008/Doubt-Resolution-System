@@ -139,7 +139,9 @@ module.exports.solvedDoubt = async function (req, res) {
 
     doubt = await Doubt.findByIdAndUpdate(
       { _id: doubt._id },
-      { $set: { solution: solution, solvedBy: assistant._id } },
+      {
+        $set: { solution: solution, solvedBy: assistant._id, status: "SOLVED" },
+      },
       { new: true }
     );
 

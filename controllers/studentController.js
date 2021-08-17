@@ -1,7 +1,6 @@
 const Student = require("../models/student");
 const Comment = require("../models/comments");
 const Doubt = require("../models/doubt");
-const mongoose = require("mongoose");
 const env = require("dotenv");
 env.config();
 
@@ -90,7 +89,7 @@ module.exports.showSolvedDoubts = async function (req, res) {
       .populate("by")
       .populate({ path: "comments", populate: { path: "doubt by" } })
       .execPopulate();
-    return res.status(200).json({ Doubt:doubt });
+    return res.status(200).json({ Doubt: doubt });
   } catch (err) {
     return res.status(400).json({ error: "Server Error" });
   }
